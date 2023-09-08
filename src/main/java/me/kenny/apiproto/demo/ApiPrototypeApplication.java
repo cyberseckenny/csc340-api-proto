@@ -16,12 +16,25 @@ public class ApiPrototypeApplication {
 	}
 
 	public static void weather() {
-		String url = "https://api.weather.gov/points/36.072701,-79.793900"; // greensboro
-		RestTemplate restTemplate = new RestTemplate();
-		ObjectMapper mapper = new ObjectMapper();
 
-		String json = restTemplate.getForObject(url, String.class);
+		try {
+			String url = "https://api.weather.gov/points/36.072701,-79.793900"; // greensboro
+			RestTemplate restTemplate = new RestTemplate();
+			ObjectMapper mapper = new ObjectMapper();
 
-		System.out.println(json);
+			String json = restTemplate.getForObject(url, String.class);
+			JsonNode root = mapper.readTree(json);
+
+			String hourlyForecast = root.findValue("forecastHourly").asText();
+			String city = root.findValues("city").get(1).asText();
+			String state = root.findValues("state").get(1).asText();
+
+			System.out.println();
+			System.out.println("Hourly Forecast URL: " + hourlyForecast);
+			System.out.println("City: " + city);
+			System.out.println("State: " + state);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
